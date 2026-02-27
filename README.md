@@ -1,5 +1,7 @@
 CORTEX V48 — Neural Consciousness Visualizer
+![Cortex Visualizer](cortex%20example.png)
 
+![Cortex Menu](cortex%20menu.png)
 A living brain that thinks in real time, fed by the pulse of GitHub.
 
 Live Demo → https://13thrule.github.io/Cortex-Github/
