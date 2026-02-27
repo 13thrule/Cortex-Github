@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CORTEX V48 — Neural Consciousness Visualizer</title>
+
+  <!-- Dependencies -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <style>
+
+/* Reset */
+*,*::before,*::after{box-sizing:border-box}
+html,body,#root{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#000108}
+canvas{display:block}
+
+/* Layout */
+.flex{display:flex}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}
+.grid{display:grid}.grid-cols-1{grid-template-columns:repeat(1,minmax(0,1fr))}.grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.items-center{align-items:center}.items-start{align-items:flex-start}
+.justify-between{justify-content:space-between}.justify-center{justify-content:center}.justify-end{justify-content:flex-end}
+.relative{position:relative}.absolute{position:absolute}
+.inset-0{top:0;right:0;bottom:0;left:0}
+.top-4{top:1rem}.top-20{top:5rem}
+.bottom-0{bottom:0}.bottom-16{bottom:4rem}.bottom-32{bottom:8rem}
+.left-0{left:0}.left-4{left:1rem}
+.right-4{right:1rem}
+.z-0{z-index:0}.z-30{z-index:30}.z-40{z-index:40}.z-50{z-index:50}
+.w-full{width:100%}.w-6{width:1.5rem}.w-16{width:4rem}.w-20{width:5rem}
+.h-screen{height:100vh}.h-full{height:100%}.h-1{height:0.25rem}
+.max-w-xs{max-width:20rem}.max-w-2xl{max-width:42rem}
+.max-h-\[40vh\]{max-height:40vh}
+.overflow-hidden{overflow:hidden}.overflow-y-auto{overflow-y:auto}
+
+/* Spacing */
+.p-2{padding:0.5rem}.p-3{padding:0.75rem}.p-4{padding:1rem}.p-8{padding:2rem}
+.px-2{padding-left:0.5rem;padding-right:0.5rem}
+.px-3{padding-left:0.75rem;padding-right:0.75rem}
+.px-6{padding-left:1.5rem;padding-right:1.5rem}
+.py-1{padding-top:0.25rem;padding-bottom:0.25rem}
+.py-4{padding-top:1rem;padding-bottom:1rem}
+.pt-2{padding-top:0.5rem}
+.mb-1{margin-bottom:0.25rem}.mb-2{margin-bottom:0.5rem}.mb-3{margin-bottom:0.75rem}.mb-8{margin-bottom:2rem}
+.mt-1{margin-top:0.25rem}.mt-2{margin-top:0.5rem}
+.ml-4{margin-left:1rem}
+.mx-4{margin-left:1rem;margin-right:1rem}
+.gap-1{gap:0.25rem}.gap-2{gap:0.5rem}.gap-3{gap:0.75rem}.gap-4{gap:1rem}
+.space-y-1>*+*{margin-top:0.25rem}
+.space-y-2>*+*{margin-top:0.5rem}
+.space-y-3>*+*{margin-top:0.75rem}
+
+/* Typography */
+.text-xs{font-size:0.75rem;line-height:1rem}
+.text-sm{font-size:0.875rem;line-height:1.25rem}
+.text-lg{font-size:1.125rem;line-height:1.75rem}
+.text-4xl{font-size:2.25rem;line-height:2.5rem}
+.text-\[10px\]{font-size:10px}
+.text-\[9px\]{font-size:9px}
+.text-\[8px\]{font-size:8px}
+.font-sans{font-family:ui-sans-serif,system-ui,-apple-system,sans-serif}
+.font-bold{font-weight:700}.font-black{font-weight:900}.font-mono{font-family:ui-monospace,monospace}
+.text-left{text-align:left}.text-center{text-align:center}.text-right{text-align:right}
+.whitespace-nowrap{white-space:nowrap}
+.uppercase{text-transform:uppercase}
+.select-none{user-select:none}
+
+/* Colors */
+.text-slate-100{color:rgb(241 245 249)}
+.text-slate-300{color:rgb(203 213 225)}
+.text-slate-400{color:rgb(148 163 184)}
+.text-slate-500{color:rgb(100 116 139)}
+.text-emerald-400{color:rgb(52 211 153)}
+.text-emerald-500{color:rgb(16 185 129)}
+.text-blue-400{color:rgb(96 165 250)}
+.text-cyan-400{color:rgb(34 211 238)}
+.text-green-400{color:rgb(74 222 128)}
+.text-yellow-400{color:rgb(250 204 21)}
+.text-purple-400{color:rgb(192 132 252)}
+.text-pink-400{color:rgb(244 114 182)}
+.text-red-400{color:rgb(248 113 113)}
+.text-orange-400{color:rgb(251 146 60)}
+.text-white{color:rgb(255 255 255)}
+
+/* Backgrounds */
+.bg-\[\#00010c\]{background-color:#00010c}
+.bg-black{background-color:rgb(0 0 0)}
+.bg-black\/50{background-color:rgba(0,0,0,0.5)}
+.bg-black\/60{background-color:rgba(0,0,0,0.6)}
+.bg-black\/90{background-color:rgba(0,0,0,0.9)}
+.bg-black\/95{background-color:rgba(0,0,0,0.95)}
+.bg-white\/5{background-color:rgba(255,255,255,0.05)}
+.bg-slate-900\/50{background-color:rgba(15,23,42,0.5)}
+.bg-slate-900\/90{background-color:rgba(15,23,42,0.9)}
+.bg-emerald-600\/40{background-color:rgba(5,150,105,0.4)}
+.bg-emerald-600\/80{background-color:rgba(5,150,105,0.8)}
+.bg-blue-600{background-color:rgb(37 99 235)}
+
+/* Borders */
+.border{border-width:1px;border-style:solid}
+.border-t{border-top-width:1px;border-top-style:solid}
+.border-slate-500{border-color:rgb(100 116 139)}
+.border-slate-700{border-color:rgb(51 65 85)}
+.border-white\/5{border-color:rgba(255,255,255,0.05)}
+.border-white\/10{border-color:rgba(255,255,255,0.1)}
+.border-emerald-400{border-color:rgb(52 211 153)}
+.border-emerald-500\/50{border-color:rgba(16,185,129,0.5)}
+.border-cyan-500\/50{border-color:rgba(6,182,212,0.5)}
+.border-green-500\/50{border-color:rgba(34,197,94,0.5)}
+
+/* Border radius */
+.rounded{border-radius:0.25rem}
+.rounded-lg{border-radius:0.5rem}
+.rounded-2xl{border-radius:1rem}
+.rounded-full{border-radius:9999px}
+
+/* Gradients */
+.bg-gradient-to-b{background-image:linear-gradient(to bottom,var(--tw-gradient-from),var(--tw-gradient-to))}
+.bg-gradient-to-t{background-image:linear-gradient(to top,var(--tw-gradient-from),var(--tw-gradient-to))}
+.from-slate-900{--tw-gradient-from:rgb(15 23 42)}
+.from-black\/90{--tw-gradient-from:rgba(0,0,0,0.9)}
+.to-black{--tw-gradient-to:rgb(0 0 0)}
+
+/* Transitions */
+.transition{transition-property:color,background-color,border-color,opacity,box-shadow,transform;transition-timing-function:cubic-bezier(0.4,0,0.2,1);transition-duration:150ms}
+.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4,0,0.2,1);transition-duration:150ms}
+.duration-300{transition-duration:300ms}
+
+/* Pointer events */
+.pointer-events-none{pointer-events:none}.pointer-events-auto{pointer-events:auto}
+
+/* Opacity */
+.opacity-40{opacity:0.4}
+
+/* Animations */
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes feedIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
+.animate-spin{animation:spin 1s linear infinite}
+
+/* Hover states */
+.hover\:bg-emerald-500\/10:hover{background-color:rgba(16,185,129,0.1)}
+.hover\:bg-emerald-500\/20:hover{background-color:rgba(16,185,129,0.2)}
+.hover\:bg-emerald-600\/20:hover{background-color:rgba(5,150,105,0.2)}
+.hover\:border-emerald-400:hover{border-color:rgb(52 211 153)}
+.hover\:border-emerald-500\/50:hover{border-color:rgba(16,185,129,0.5)}
+.hover\:text-emerald-400:hover{color:rgb(52 211 153)}
+.hover\:text-white:hover{color:rgb(255 255 255)}
+
+/* Group hover */
+.group:hover .group-hover\:text-emerald-300{color:rgb(110 231 183)}
+.group:hover .group-hover\:text-slate-400{color:rgb(148 163 184)}
+
+/* Emerald active state */
+.bg-emerald-600\/50{background-color:rgba(5,150,105,0.5)}
+.border-emerald-400{border-color:rgb(52 211 153)}
+.text-emerald-300{color:rgb(110 231 183)}
+
+/* Live feed panel */
+.feed-item{display:flex;flex-direction:column;gap:2px;padding:5px 8px;border-left:2px solid transparent;transition:opacity 0.3s}
+.feed-dot{display:inline-block;width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:2px}
+.feed-scroll{display:flex;flex-direction:column;gap:2px;overflow:hidden;max-height:calc(100vh - 220px)}
+@keyframes feedIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+.feed-new{animation:feedIn 0.3s ease-out forwards}
+/* Yellow/Cyan/Purple progress bars */
+.bg-yellow-500{background-color:rgb(234 179 8)}
+.bg-cyan-500{background-color:rgb(6 182 212)}
+.bg-purple-500{background-color:rgb(168 85 247)}
+.text-cyan-400{color:rgb(34 211 238)}
+.text-purple-400{color:rgb(192 132 252)}
+.bg-slate-900\/80{background-color:rgba(15,23,42,0.8)}
+
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  
+  <script>
+    // Silence Babel in-browser dev warning — intentional offline use
+    (function(){
+      const _warn = console.warn.bind(console);
+      console.warn = function(...args) {
+        if (typeof args[0] === 'string' && args[0].includes('in-browser Babel')) return;
+        _warn(...args);
+      };
+    })();
+  </script>
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // ── Lucide icons (inline SVG replacements) ──────────────────────────────
+    const Icon = ({ d, size = 16, ...props }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        {Array.isArray(d) ? d.map((p, i) => <path key={i} d={p} />) : <path d={d} />}
+      </svg>
+    );
+    const Play        = (p) => <Icon {...p} d="M5 3l14 9-14 9V3z" />;
+    const Pause       = (p) => <Icon {...p} d={["M6 4h4v16H6z","M14 4h4v16h-4z"]} />;
+    const RefreshCw   = (p) => <Icon {...p} d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />;
+    const BarChart2   = (p) => <Icon {...p} d={["M18 20V10","M12 20V4","M6 20v-6"]} />;
+    const BrainCircuit= (p) => <Icon {...p} d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z M9 13a4.5 4.5 0 0 0 3-4 M6.003 5.125A3 3 0 0 0 6.401 6.5 M3.477 10.896a4 4 0 0 1 .585-.396 M12 13h4 M13 18h2a2 2 0 0 0 2-2v-1 M18 22a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z M20 13.5V12a2 2 0 0 0-2-2h-3" />;
+    const Activity    = (p) => <Icon {...p} d="M22 12h-4l-3 9L9 3l-3 9H2" />;
+    const Brain       = (p) => <Icon {...p} d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z" />;
+    const HelpCircle  = (p) => <Icon {...p} d={["M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z","M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3","M12 17h.01"]} />;
+    const X           = (p) => <Icon {...p} d={["M18 6 6 18","M6 6l12 12"]} />;
+
+    // ── Brain Profiles ───────────────────────────────────────────────────────
+    const BRAIN_PROFILES = {
+      newborn:    { name:"Newborn",    description:"Watch consciousness emerge from zero. Compact, ultra-fast learning, volatile emotions.", innerCount:100000,outerCount:100000,initialConsciousness:0.01,learningRate:2.5,signalSpeed:0.08,memoryCapacity:50, emotionalVolatility:1.5,maxRipples:16,baseGlow:1.0 },
+      adolescent: { name:"Adolescent", description:"Balanced experience with developing knowledge. Moderate growth, stable learning.",         innerCount:300000,outerCount:300000,initialConsciousness:0.35,learningRate:1.5,signalSpeed:0.04,memoryCapacity:200,emotionalVolatility:1.0,maxRipples:24,baseGlow:1.2 },
+      mature:     { name:"Mature",     description:"Wise, experienced consciousness. Large, cautious learning, stable emotions.",              innerCount:500000,outerCount:500000,initialConsciousness:0.68,learningRate:0.8,signalSpeed:0.02,memoryCapacity:500,emotionalVolatility:0.6,maxRipples:32,baseGlow:1.5 },
+      savant:     { name:"Savant",     description:"Intense specialist with hyper-learning. Compact but densely connected, extreme reactions.", innerCount:200000,outerCount:200000,initialConsciousness:0.42,learningRate:3.5,signalSpeed:0.12,memoryCapacity:300,emotionalVolatility:2.0,maxRipples:40,baseGlow:2.0 },
+      explorer:   { name:"Explorer",   description:"Curious wanderer with dispersed connections. Tangential thinking, high exploration.",       innerCount:250000,outerCount:250000,initialConsciousness:0.28,learningRate:2.0,signalSpeed:0.06,memoryCapacity:150,emotionalVolatility:1.3,maxRipples:28,baseGlow:1.3 },
+    };
+
+    const NEURAL_SPECTRUM = [
+      "#FF0000","#FF1111","#FF2222","#FF3333","#FF4444","#FF5555","#FF6666","#FF7777",
+      "#FF8800","#FF9911","#FFAA22","#FFBB33","#FFCC44","#FFDD55","#FFEE66","#FFFF77",
+      "#FFFF00","#FFFF11","#FFFF22","#FFFF33","#FFFF44","#FFFF55","#FFFF66","#FFFF77",
+      "#00FF00","#11FF11","#22FF22","#33FF33","#44FF44","#55FF55","#66FF66","#77FF77",
+      "#00FFFF","#11FFFF","#22FFFF","#33FFFF","#44FFFF","#55FFFF","#66FFFF","#77FFFF",
+      "#0000FF","#1111FF","#2222FF","#3333FF","#4444FF","#5555FF","#6666FF","#7777FF",
+      "#FF00FF","#FF11FF","#FF22FF","#FF33FF","#FF44FF","#FF55FF","#FF66FF","#FF77FF",
+      "#BB00FF","#CC11FF","#DD22FF","#EE33FF","#FF44FF","#FF55FF","#FF66FF","#FF77FF",
+    ];
+
+    const NEURON_TYPES = [
+      { name:"Executive",    color:"#FF0000", range:[0,7],   function:"Decision making & logic" },
+      { name:"Sensory/Motor",color:"#FF8800", range:[8,15],  function:"Input/output processing" },
+      { name:"Memory",       color:"#FFFF00", range:[16,23], function:"Pattern storage & recall" },
+      { name:"Cognitive",    color:"#00FF00", range:[24,31], function:"Problem solving" },
+      { name:"Association",  color:"#00FFFF", range:[32,39], function:"Cross-domain linking" },
+      { name:"Temporal",     color:"#0000FF", range:[40,47], function:"Sequence processing" },
+      { name:"Emotional",    color:"#FF00FF", range:[48,55], function:"Valence & motivation" },
+      { name:"Integrative",  color:"#BB00FF", range:[56,63], function:"Higher synthesis" },
+    ];
+
+    const METRIC_EXPLANATIONS = {
+      neuralPlasticity:   "How much the brain's physical structure has changed through learning",
+      patternRecognition: "Number of unique learned patterns (more = smarter)",
+      emergentComplexity: "Measure of how interconnected the network is",
+      consciousness:      "How aware the system is becoming of itself",
+    };
+
+    // ── Profile Selector ─────────────────────────────────────────────────────
+    function ProfileSelector({ onSelectProfile }) {
+      return (
+        <div className="absolute inset-0 bg-black z-50 flex items-center justify-center">
+          <div className="bg-gradient-to-b from-slate-900 to-black border border-emerald-500/50 rounded-2xl p-8 max-w-2xl w-full mx-4">
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-black text-emerald-400 mb-2">CORTEX</h1>
+              <p className="text-slate-400">Choose Your Brain Profile</p>
+            </div>
+            <div className="grid grid-cols-1 gap-3 mb-8">
+              {Object.entries(BRAIN_PROFILES).map(([key, profile]) => (
+                <button key={key} onClick={() => onSelectProfile(key)}
+                  className="group text-left p-4 rounded-lg border border-slate-700 hover:border-emerald-500/50 hover:bg-emerald-500/10 transition duration-300">
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <h3 className="font-bold text-emerald-400 group-hover:text-emerald-300">{profile.name}</h3>
+                      <p className="text-xs text-slate-400 mt-1">{profile.description}</p>
+                    </div>
+                    <div className="text-right text-[10px] text-slate-500 group-hover:text-slate-400 whitespace-nowrap ml-4">
+                      <div>{Math.round(profile.innerCount/1000)}k neurons</div>
+                      <div>{profile.initialConsciousness > 0 ? `${(profile.initialConsciousness*100).toFixed(0)}% aware` : 'Newborn'}</div>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+            <div className="text-xs text-slate-500 text-center">
+              <p>Each profile shapes how your brain learns, grows, and processes consciousness.</p>
+              <p className="mt-2">You can change profiles anytime by clicking the brain icon.</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── Constants ─────────────────────────────────────────────────────────────
+    const OUTER_RADIUS   = 155;
+    const INNER_RADIUS   = 105;
+    const MAX_ACTIVE_NEURONS = 50;
+    const POOL_SIZE      = 300;
+
+    let OUTER_COUNT = 300000;
+    let INNER_COUNT = 250000;
+    let MAX_RIPPLES = 32;
+    let MEMORY_SIZE = 200;
+
+    const LOBES = [
+      { id:"frontal",  idx:0, name:"Frontal Cortex",  color:"#10b981", pos: new THREE.Vector3(0,1,1).normalize().multiplyScalar(INNER_RADIUS),   neuronType:0, function:"Executive decisions & planning" },
+      { id:"parietal", idx:1, name:"Parietal Cortex", color:"#d946ef", pos: new THREE.Vector3(0,1,-1).normalize().multiplyScalar(INNER_RADIUS),  neuronType:2, function:"Memory consolidation" },
+      { id:"temporal", idx:2, name:"Temporal Cortex", color:"#f59e0b", pos: new THREE.Vector3(1,0,0).normalize().multiplyScalar(INNER_RADIUS),   neuronType:5, function:"Sequence processing" },
+      { id:"occipital",idx:3, name:"Occipital Cortex",color:"#3b82f6", pos: new THREE.Vector3(0,-0.5,-1).normalize().multiplyScalar(INNER_RADIUS),neuronType:3, function:"Pattern analysis" },
+    ];
+
+    const STATES = { AWAKE:'awake', PROCESSING:'processing', DREAMING:'dreaming', LEARNING:'learning', ENLIGHTENED:'enlightened' };
+
+    // ── Shaders ───────────────────────────────────────────────────────────────
+    const lineVertexShader = `
+      attribute float aRatio; varying float vRatio;
+      void main() { vRatio=aRatio; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }
+    `;
+    const lineFragmentShader = `
+      uniform vec3 uColor; uniform float uProgress; uniform float uDecay; varying float vRatio;
+      void main() {
+        float headDist=uProgress-vRatio;
+        if(headDist<0.0&&uProgress<=1.0) discard;
+        float head=exp(-max(headDist,0.0)*30.0);
+        gl_FragColor=vec4(mix(uColor,vec3(1.0),head*0.95),max(head,0.2)*uDecay);
+      }
+    `;
+    const outerVertexShader = `
+      uniform float uTime,uStress,uConsciousness,uMoodInfluence;
+      attribute float aSize; attribute vec3 aBaseColor; attribute float aStars,aActivation;
+      varying vec3 vColor; varying float vActivation;
+      void main() {
+        vec3 newPos=position;
+        float wave=sin(position.x*0.02+uTime)*cos(position.y*0.02+uTime);
+        newPos+=normalize(position)*wave*(1.5+uStress*3.0+uConsciousness*2.0+uMoodInfluence);
+        newPos+=normalize(position)*aActivation*5.0;
+        vColor=mix(aBaseColor,vec3(1.0),aActivation*0.5); vActivation=aActivation;
+        vec4 mvPosition=modelViewMatrix*vec4(newPos,1.0);
+        gl_PointSize=aSize*(0.3+aStars*0.8+aActivation*1.5)*(600.0/-mvPosition.z);
+        gl_Position=projectionMatrix*mvPosition;
+      }
+    `;
+    const outerFragmentShader = `
+      varying vec3 vColor; varying float vActivation;
+      void main() {
+        float r=distance(gl_PointCoord,vec2(0.5)); if(r>0.5) discard;
+        float strength=exp(-pow(r*2.5,2.0)*4.0);
+        gl_FragColor=vec4(vColor*(1.0+vActivation*2.0),strength*(0.5+vActivation*1.5));
+      }
+    `;
+    const innerVertexShader = `
+      #define MAX_RIPPLES 32
+      #define MAX_ACTIVE 50
+      uniform float uTime,uStress,uConsciousness,uDreaming,uMoodInfluence;
+      uniform vec3 uMoodColor;
+      uniform vec3 uRipplesPos[MAX_RIPPLES]; uniform float uRipplesProgress[MAX_RIPPLES]; uniform vec3 uRipplesColor[MAX_RIPPLES];
+      uniform vec3 uLobePos[4]; uniform float uLobeHypertrophy[4],uLobeMemory[4];
+      uniform vec3 uActiveNeurons[MAX_ACTIVE],uActiveColors[MAX_ACTIVE]; uniform float uActiveStrength[MAX_ACTIVE]; uniform int uActiveCount;
+      attribute float aSize; attribute vec3 aBaseColor; attribute float aStars;
+      varying vec3 vColor; varying float vIntensity;
+      void main() {
+        vec3 newPos=position;
+        float dreamWave=sin(uTime*2.0+position.x*0.1)*uDreaming*15.0;
+        float breath=sin(uTime*1.5)*(1.0+aStars*2.0);
+        vec3 accColor=aBaseColor; float totalInfluence=0.0,activationInfluence=0.0;
+        for(int i=0;i<MAX_RIPPLES;i++){
+          if(uRipplesProgress[i]>=1.0||uRipplesProgress[i]<=0.0) continue;
+          float dist=distance(position,uRipplesPos[i]);
+          float wave=exp(-pow(dist-uRipplesProgress[i]*200.0,2.0)/200.0)*(1.0-uRipplesProgress[i]);
+          if(wave>0.01){ accColor=mix(accColor,uRipplesColor[i]*1.8,min(wave,1.0)); totalInfluence+=wave*10.0; }
+        }
+        for(int i=0;i<MAX_ACTIVE;i++){
+          if(i>=uActiveCount) break;
+          float dist=distance(position,uActiveNeurons[i]);
+          float influence=exp(-pow(dist*0.015,2.0))*uActiveStrength[i];
+          if(influence>0.01){ accColor=mix(accColor,uActiveColors[i]*2.0,influence*0.6); activationInfluence+=influence*15.0; }
+        }
+        float totalHypertrophy=0.0,totalMemory=0.0;
+        for(int i=0;i<4;i++){
+          float d=distance(position,uLobePos[i]);
+          float influence=exp(-pow(d*0.025,2.0));
+          totalHypertrophy+=influence*uLobeHypertrophy[i]*40.0;
+          totalMemory+=influence*uLobeMemory[i]*20.0;
+        }
+        float displacement=breath+totalInfluence+totalHypertrophy+totalMemory+uStress*2.0+dreamWave+activationInfluence;
+        newPos+=normalize(position)*clamp(displacement,-80.0,80.0);
+        vColor=mix(accColor,mix(vec3(1.0,0.8,1.0),uMoodColor,0.5),uConsciousness*0.3+uMoodInfluence*0.2);
+        vIntensity=1.0+aStars*2.5+totalInfluence*4.0+totalHypertrophy*2.5+totalMemory*1.5+uConsciousness*2.0+uMoodInfluence*1.0+activationInfluence*3.0;
+        vec4 mvPos=modelViewMatrix*vec4(newPos,1.0);
+        gl_PointSize=aSize*(700.0/-mvPos.z)*(1.0+totalInfluence*0.15+totalHypertrophy*0.2+uConsciousness*0.1+activationInfluence*0.3);
+        gl_Position=projectionMatrix*mvPos;
+      }
+    `;
+    const innerFragmentShader = `
+      uniform float uTime,uStress,uConsciousness,uDreaming,uMoodInfluence;
+      varying vec3 vColor; varying float vIntensity;
+      void main() {
+        float r=distance(gl_PointCoord,vec2(0.5)); if(r>0.5) discard;
+        float str=exp(-pow(r*2.5,2.0)*4.0);
+        float pulse=1.0+sin(uTime*2.5+uStress)*0.2;
+        float dreamPulse=1.0+sin(uTime*1.5)*uDreaming*0.5;
+        float consciousGlow=1.0+uConsciousness*3.0;
+        float moodPulse=1.0+sin(uTime*1.2)*uMoodInfluence*0.3;
+        gl_FragColor=vec4(vColor*vIntensity*pulse*dreamPulse*consciousGlow*moodPulse,str*1.3);
+      }
+    `;
+
+    // ── Main App ─────────────────────────────────────────────────────────────
+    function App() {
+      const [selectedProfile,    setSelectedProfile]    = useState(null);
+      const [currentProfileData, setCurrentProfileData] = useState(null);
+      const [isReady,            setIsReady]            = useState(false);
+      const [isPlaying,          setIsPlaying]          = useState(true);
+      const [isTrayOpen,         setIsTrayOpen]         = useState(false);
+      const [tabIndex,           setTabIndex]           = useState(0);
+      const [helpTooltip,        setHelpTooltip]        = useState(null);
+      const [showMenu,           setShowMenu]           = useState(false);
+      const [menuOpen,           setMenuOpen]           = useState(false);
+      const [velocity,           setVelocity]           = useState(0);
+      const [evolutionScore,     setEvolutionScore]     = useState(0);
+      const [consciousness,      setConsciousness]      = useState(0);
+      const [state,              setState]              = useState(STATES.AWAKE);
+      const [emotions,           setEmotions]           = useState({ joy:0, curiosity:0, frustration:0, satisfaction:0 });
+      const [memories,           setMemories]           = useState([]);
+      const [neuralPlasticity,   setNeuralPlasticity]   = useState(0);
+      const [patternRecognition, setPatternRecognition] = useState(0);
+      const [emergentComplexity, setEmergentComplexity] = useState(0);
+      const [metaAwareness,      setMetaAwareness]      = useState(0);
+      const [currentEvent,       setCurrentEvent]       = useState(null);
+      const [currentSignalProgress, setCurrentSignalProgress] = useState(0);
+      const [activeLobe,         setActiveLobe]         = useState(null);
+      const [memoryMatches,      setMemoryMatches]      = useState([]);
+      const [liveFeed,           setLiveFeed]           = useState([]);
+      const [feedConnected,      setFeedConnected]      = useState(false);
+      const [showLeft,           setShowLeft]           = useState(true);
+      const [showRight,          setShowRight]          = useState(true);
+
+      const containerRef = useRef(null);
+      const rendererRef  = useRef(null);
+      const worldRef     = useRef(new THREE.Group());
+      const synapseGroupRef = useRef(new THREE.Group());
+      const photonGroupRef  = useRef(new THREE.Group());
+
+      const zoomRef        = useRef(580);
+      const targetZoomRef  = useRef(580);
+      const isDragging     = useRef(false);
+      const eventQueue     = useRef([]);
+      const memoryQueueRef = useRef([]);
+      const patternMapRef  = useRef(new Map());
+      const predictedNextEventRef = useRef(null);
+      const poolRef        = useRef([]);
+      const poolIdx        = useRef(0);
+
+      const innerMeshRef    = useRef(null);
+      const innerMeshMatRef = useRef(null);
+      const outerMeshMatRef = useRef(null);
+      const targetVelocityRef   = useRef(0);
+      const smoothedVelocityRef = useRef(0);
+      const evolutionScoreRef   = useRef(0);
+      const consciousnessRef    = useRef(0);
+      const emotionsRef         = useRef({ joy:0, curiosity:0, frustration:0, satisfaction:0 });
+      const lobeActivityRef     = useRef([0,0,0,0]);
+      const lastActivityRef     = useRef(Date.now());
+      const dreamingRef         = useRef(0);
+      const focusedLobeRef      = useRef(0);
+      const selfTalkCountRef    = useRef(0);
+      const connectionCountRef  = useRef(0);
+
+      const ripplesPosArr  = useRef(Array(MAX_RIPPLES).fill(0).map(()=>new THREE.Vector3()));
+      const ripplesProgArr = useRef(new Float32Array(MAX_RIPPLES).fill(0));
+      const ripplesColArr  = useRef(Array(MAX_RIPPLES).fill(0).map(()=>new THREE.Color()));
+      const lobeHypertrophyRef = useRef(new Float32Array(4).fill(0));
+      const lobeMemoryRef      = useRef(new Float32Array(4).fill(0));
+      const rippleIndex        = useRef(0);
+
+      const signalWavesRef              = useRef([]);
+      const pulseRingsRef               = useRef(null);
+      const pulseRingIdxRef             = useRef(0);
+      const activeNeuronPositionsRef    = useRef(Array(MAX_ACTIVE_NEURONS).fill(0).map(()=>new THREE.Vector3()));
+      const activeNeuronColorsRef       = useRef(Array(MAX_ACTIVE_NEURONS).fill(0).map(()=>new THREE.Color()));
+      const activeNeuronStrengthRef     = useRef(new Float32Array(MAX_ACTIVE_NEURONS).fill(0));
+      const activeNeuronCountRef        = useRef(0);
+      const getInnerNeuronPositions     = useRef(null);
+
+      const getLobeByHash = (str) => {
+        let hash=0; for(let i=0;i<str.length;i++) hash=str.charCodeAt(i)+((hash<<5)-hash);
+        return LOBES[Math.abs(hash)%LOBES.length];
+      };
+      const getColorByNeuronType = (lobeIdx) => {
+        const lobe=LOBES[lobeIdx], tr=NEURON_TYPES[lobe.neuronType].range;
+        return NEURAL_SPECTRUM[tr[0]+Math.floor(Math.random()*(tr[1]-tr[0]+1))];
+      };
+      const getPersistenceCoords = (name) => {
+        let hash=0; for(let i=0;i<name.length;i++) hash=name.charCodeAt(i)+((hash<<5)-hash);
+        const lat=Math.abs(hash%150)-75, lon=Math.abs((hash>>8)%360)-180;
+        const phi=(90-lat)*(Math.PI/180), theta=(lon+180)*(Math.PI/180);
+        return new THREE.Vector3(-OUTER_RADIUS*Math.sin(phi)*Math.cos(theta),OUTER_RADIUS*Math.cos(phi),OUTER_RADIUS*Math.sin(phi)*Math.sin(theta));
+      };
+
+      const initiateSignalPropagation = (patternKey, color, startPos, targetLobe, eventTitle) => {
+        if(!getInnerNeuronPositions.current) return;
+        setMemoryMatches(Array.from(memoryQueueRef.current).filter(m=>m.event===eventTitle).slice(0,3));
+        setCurrentEvent(eventTitle); setActiveLobe(targetLobe.name);
+        const wave={ id:Date.now()+Math.random(), color:new THREE.Color(color), startPos:startPos.clone(), targetLobe, progress:0, speed:currentProfileData?.signalSpeed||0.04 };
+        signalWavesRef.current.push(wave);
+        if(signalWavesRef.current.length>20) signalWavesRef.current.shift();
+      };
+
+      const updateSignalPropagation = () => {
+        const innerPositions=getInnerNeuronPositions.current; if(!innerPositions) return;
+        activeNeuronCountRef.current=0;
+        for(let w=signalWavesRef.current.length-1;w>=0;w--){
+          const wave=signalWavesRef.current[w]; wave.progress+=wave.speed;
+          setCurrentSignalProgress(Math.round(wave.progress*100));
+          if(wave.progress>=1.0){ signalWavesRef.current.splice(w,1); continue; }
+          const currentPos=new THREE.Vector3(); currentPos.lerpVectors(wave.startPos,wave.targetLobe.pos,wave.progress);
+          const neuronSampleSize=Math.max(1,Math.floor(INNER_COUNT/3000));
+          for(let i=0;i<Math.min(INNER_COUNT,5000);i+=neuronSampleSize){
+            const neuronPos=new THREE.Vector3(innerPositions[i*3],innerPositions[i*3+1],innerPositions[i*3+2]);
+            const dist=neuronPos.distanceTo(currentPos);
+            if(dist<20&&activeNeuronCountRef.current<MAX_ACTIVE_NEURONS){
+              const strength=1.0-(dist/20);
+              activeNeuronPositionsRef.current[activeNeuronCountRef.current].copy(neuronPos);
+              activeNeuronColorsRef.current[activeNeuronCountRef.current].copy(wave.color);
+              activeNeuronStrengthRef.current[activeNeuronCountRef.current]=strength*0.9;
+              activeNeuronCountRef.current++;
+            }
+          }
+        }
+      };
+
+      const recordMemory = (event, lobe) => {
+        const memory={ id:Date.now(), timestamp:Date.now(), event:event.title.substring(0,40), user:event.user.substring(0,20), lobe:lobe.name, strength:1.0, emotions:{...emotionsRef.current} };
+        memoryQueueRef.current.push(memory);
+        setMemories(prev=>[memory,...prev].slice(0,MEMORY_SIZE));
+        const patternKey=`${event.title.substring(0,10)}_${lobe.idx}`;
+        if(patternMapRef.current.has(patternKey)){ const p=patternMapRef.current.get(patternKey); p.count+=1; p.strength=Math.min(5,p.strength+0.1); }
+        else { patternMapRef.current.set(patternKey,{count:1,strength:1,lobe}); connectionCountRef.current+=1; }
+        setPatternRecognition(patternMapRef.current.size);
+      };
+
+      const updateEmotions = (lobeActivity, surprise=false) => {
+        const v=currentProfileData?.emotionalVolatility||1.0;
+        emotionsRef.current.curiosity=Math.min(1,emotionsRef.current.curiosity+0.05*v);
+        if(surprise) emotionsRef.current.frustration=Math.min(1,emotionsRef.current.frustration+0.15*v);
+        else emotionsRef.current.satisfaction=Math.min(1,emotionsRef.current.satisfaction+0.08*v);
+        emotionsRef.current.joy=Math.max(0,emotionsRef.current.joy+(velocity/150)*0.1*v);
+        emotionsRef.current.curiosity=Math.max(0,emotionsRef.current.curiosity-0.002);
+        emotionsRef.current.frustration=Math.max(0,emotionsRef.current.frustration-0.001);
+        emotionsRef.current.satisfaction=Math.max(0,emotionsRef.current.satisfaction-0.003);
+        emotionsRef.current.joy=Math.max(0,emotionsRef.current.joy-0.005);
+        setEmotions({...emotionsRef.current});
+      };
+
+      const makePrediction = (nextEvent) => {
+        if(!predictedNextEventRef.current){ predictedNextEventRef.current=nextEvent; return null; }
+        const correct=predictedNextEventRef.current.title===nextEvent.title;
+        predictedNextEventRef.current=nextEvent; return correct;
+      };
+
+      const fetchData = async () => {
+        try {
+          const res=await fetch('https://api.github.com/events?per_page=50');
+          if(res.ok){ const data=await res.json(); eventQueue.current=[...data.map(e=>({title:e.repo.name,user:e.actor.login,type:e.type})),...eventQueue.current].slice(0,300); setFeedConnected(true); }
+        } catch(e) {
+          const fakeEvents=Array(40).fill(0).map((_,i)=>({title:`Event_${i}`,user:`User_${i}`,type:'PushEvent'}));
+          eventQueue.current=[...fakeEvents,...eventQueue.current];
+        }
+        setIsReady(true);
+      };
+
+      useEffect(()=>{ fetchData(); const t=setInterval(fetchData,45000); return ()=>clearInterval(t); },[]);
+
+      useEffect(()=>{
+        if(selectedProfile&&!isReady&&currentProfileData){ consciousnessRef.current=currentProfileData.initialConsciousness; setConsciousness(currentProfileData.initialConsciousness); setIsReady(true); }
+      },[selectedProfile,isReady]);
+
+      useEffect(()=>{
+        if(!isReady) return;
+        const dripTimer=setInterval(()=>{
+          if(eventQueue.current.length>0&&isPlaying){
+            const evt=eventQueue.current.pop();
+            targetVelocityRef.current=Math.min(120,(eventQueue.current.length/1.5)+targetVelocityRef.current*0.4);
+            setVelocity(Math.round(targetVelocityRef.current));
+            const targetLobe=getLobeByHash(evt.title);
+            const neuronColor=getColorByNeuronType(targetLobe.idx);
+            const wasPredictionCorrect=makePrediction(evt);
+            const typeShort=evt.type.replace('Event','');
+            setLiveFeed(prev=>[{id:Date.now(),user:evt.user,repo:evt.title,type:typeShort,color:neuronColor,lobe:targetLobe.name,ts:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'})},...prev].slice(0,60));
+            updateEmotions(targetLobe.idx,!wasPredictionCorrect);
+            setState(STATES.PROCESSING);
+            const idx=rippleIndex.current;
+            ripplesPosArr.current[idx].copy(targetLobe.pos);
+            ripplesProgArr.current[idx]=0.01;
+            ripplesColArr.current[idx].set(neuronColor);
+            rippleIndex.current=(rippleIndex.current+1)%MAX_RIPPLES;
+            lobeHypertrophyRef.current[targetLobe.idx]=Math.min(4.0,lobeHypertrophyRef.current[targetLobe.idx]+0.3);
+            lobeMemoryRef.current[targetLobe.idx]=Math.min(5.0,lobeMemoryRef.current[targetLobe.idx]+0.15);
+            evolutionScoreRef.current+=1; setEvolutionScore(prev=>prev+1);
+            const lr=currentProfileData?.learningRate||1.5;
+            consciousnessRef.current=Math.min(1.0,consciousnessRef.current+0.005*lr);
+            setConsciousness(prev=>Math.min(1,prev+0.005*lr));
+            recordMemory(evt,targetLobe);
+            lobeActivityRef.current[targetLobe.idx]=1.0;
+            focusedLobeRef.current=targetLobe.idx;
+            const patternKey=`${evt.title.substring(0,10)}_${targetLobe.idx}`;
+            initiateSignalPropagation(patternKey,neuronColor,getPersistenceCoords(evt.user),targetLobe,evt.title);
+            if(Math.random()<0.45){
+              const reflLobe=LOBES[Math.floor(Math.random()*4)];
+              if(reflLobe.idx!==targetLobe.idx){
+                selfTalkCountRef.current+=1; setMetaAwareness(prev=>prev+0.5);
+                setTimeout(()=>{
+                  const rIdx=rippleIndex.current;
+                  ripplesPosArr.current[rIdx].copy(reflLobe.pos);
+                  ripplesProgArr.current[rIdx]=0.01;
+                  ripplesColArr.current[rIdx].set(getColorByNeuronType(reflLobe.idx));
+                  rippleIndex.current=(rippleIndex.current+1)%MAX_RIPPLES;
+                  lobeHypertrophyRef.current[reflLobe.idx]=Math.min(4.0,lobeHypertrophyRef.current[reflLobe.idx]+0.2);
+                },150+Math.random()*250);
+              }
+            }
+            if(poolRef.current.length){
+              const anim=poolRef.current[poolIdx.current];
+              poolIdx.current=(poolIdx.current+1)%poolRef.current.length;
+              // Fire from centre (0,0,0) outward to target lobe
+              const hypertrophyAmount=lobeHypertrophyRef.current[targetLobe.idx];
+              const targetPos=targetLobe.pos.clone().normalize().multiplyScalar(INNER_RADIUS+hypertrophyAmount*15);
+              // Slight lateral wobble so concurrent pings are visually distinct
+              const perp=new THREE.Vector3(-targetPos.y,targetPos.x,0).normalize().multiplyScalar((Math.random()-0.5)*20);
+              const mid=targetPos.clone().multiplyScalar(0.4).add(perp);
+              anim.p0.set(0,0,0); anim.p1.copy(mid); anim.p2.copy(targetPos);
+              const positions=anim.trail.geometry.attributes.position.array;
+              for(let j=0;j<=50;j++){ const t=j/50,mt=1-t; positions[j*3]=mt*mt*anim.p0.x+2*mt*t*anim.p1.x+t*t*anim.p2.x; positions[j*3+1]=mt*mt*anim.p0.y+2*mt*t*anim.p1.y+t*t*anim.p2.y; positions[j*3+2]=mt*mt*anim.p0.z+2*mt*t*anim.p1.z+t*t*anim.p2.z; }
+              anim.trail.geometry.attributes.position.needsUpdate=true;
+              anim.trail.material.uniforms.uColor.value.set(neuronColor);
+              anim.trail.material.uniforms.uProgress.value=0;
+              anim.trail.material.uniforms.uDecay.value=1.0;
+              anim.trail.visible=true; anim.p=0; anim.decay=1.0; anim.state='moving';
+              anim.packet.material.color.set(neuronColor);
+              anim.packet.visible=false;
+              // Spawn a particle-ring pulse from centre
+              if(pulseRingsRef.current){
+                const ring=pulseRingsRef.current[pulseRingIdxRef.current];
+                pulseRingIdxRef.current=(pulseRingIdxRef.current+1)%pulseRingsRef.current.length;
+                // Update per-ring colour via vertex colour attribute
+                const col=new THREE.Color(neuronColor);
+                const colArr=ring.geometry.attributes.color.array;
+                for(let ci=0;ci<colArr.length;ci+=3){ colArr[ci]=col.r; colArr[ci+1]=col.g; colArr[ci+2]=col.b; }
+                ring.geometry.attributes.color.needsUpdate=true;
+                ring.material.uniforms.uOpacity.value=0.95;
+                ring.material.uniforms.uRadius.value=0.5;
+                ring.userData.speed=1.4+Math.random()*0.8;
+                // Orient the ring plane to face toward its target lobe
+                ring.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1), targetPos.clone().normalize());
+                ring.visible=true;
+              }
+            }
+            setState(STATES.AWAKE);
+          }
+          const totalHypertrophy=Array.from(lobeHypertrophyRef.current).reduce((a,b)=>a+b,0);
+          setNeuralPlasticity(Math.round(totalHypertrophy*10));
+          setEmergentComplexity(Math.round(Math.log(1+patternMapRef.current.size)*100));
+          updateSignalPropagation();
+          for(let i=0;i<lobeActivityRef.current.length;i++) lobeActivityRef.current[i]*=0.95;
+        },850);
+        return ()=>clearInterval(dripTimer);
+      },[isReady,isPlaying]);
+
+      useEffect(()=>{
+        if(!isReady||!containerRef.current) return;
+        const profile=currentProfileData;
+        if(profile){ OUTER_COUNT=Math.floor(profile.outerCount); INNER_COUNT=Math.floor(profile.innerCount); MAX_RIPPLES=profile.maxRipples||32; MEMORY_SIZE=profile.memoryCapacity||200; }
+
+        const w=containerRef.current.clientWidth||window.innerWidth;
+        const h=containerRef.current.clientHeight||window.innerHeight;
+        const scene=new THREE.Scene(); scene.background=new THREE.Color(0x000108);
+        const camera=new THREE.PerspectiveCamera(30,w/h,1,5000); camera.position.z=zoomRef.current;
+        const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
+        renderer.setSize(w,h); renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+        containerRef.current.appendChild(renderer.domElement); rendererRef.current=renderer;
+        const world=worldRef.current; scene.add(world); world.add(synapseGroupRef.current); world.add(photonGroupRef.current);
+
+        // Outer shell
+        const outGeo=new THREE.BufferGeometry();
+        const outPos=new Float32Array(OUTER_COUNT*3),outCol=new Float32Array(OUTER_COUNT*3),outSz=new Float32Array(OUTER_COUNT),outStars=new Float32Array(OUTER_COUNT),outActivation=new Float32Array(OUTER_COUNT);
+        for(let i=0;i<OUTER_COUNT;i++){
+          const phi=Math.acos(-1+(2*i)/OUTER_COUNT),theta=Math.sqrt(OUTER_COUNT*Math.PI)*phi;
+          outPos[i*3]=OUTER_RADIUS*Math.cos(theta)*Math.sin(phi); outPos[i*3+1]=OUTER_RADIUS*Math.sin(theta)*Math.sin(phi); outPos[i*3+2]=OUTER_RADIUS*Math.cos(phi);
+          outStars[i]=Math.pow(Math.random(),6); outActivation[i]=0;
+          const land=Math.sin(theta*0.05)*Math.cos(90-phi*180/Math.PI*0.08)>-0.2;
+          if(land){ outCol[i*3]=0.02; outCol[i*3+1]=0.08; outCol[i*3+2]=0.2; outSz[i]=0.5; }
+          else { outCol[i*3]=0.01; outCol[i*3+1]=0.03; outCol[i*3+2]=0.1; outSz[i]=0.25; }
+        }
+        outGeo.setAttribute('position',new THREE.BufferAttribute(outPos,3));
+        outGeo.setAttribute('aBaseColor',new THREE.BufferAttribute(outCol,3));
+        outGeo.setAttribute('aSize',new THREE.BufferAttribute(outSz,1));
+        outGeo.setAttribute('aStars',new THREE.BufferAttribute(outStars,1));
+        outGeo.setAttribute('aActivation',new THREE.BufferAttribute(outActivation,1));
+        const moodColor=new THREE.Color(Math.max(0.3,emotionsRef.current.joy),Math.max(0.3,emotionsRef.current.curiosity),Math.max(0.3,emotionsRef.current.satisfaction));
+        outerMeshMatRef.current=new THREE.ShaderMaterial({uniforms:{uTime:{value:0},uStress:{value:0},uConsciousness:{value:0},uMoodInfluence:{value:0}},vertexShader:outerVertexShader,fragmentShader:outerFragmentShader,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false});
+        world.add(new THREE.Points(outGeo,outerMeshMatRef.current));
+
+        // Inner cortex
+        const inGeo=new THREE.BufferGeometry();
+        const inPos=new Float32Array(INNER_COUNT*3),inCol=new Float32Array(INNER_COUNT*3),inSz=new Float32Array(INNER_COUNT),inStars=new Float32Array(INNER_COUNT);
+        for(let i=0;i<INNER_COUNT;i++){
+          const phi=Math.acos(-1+(2*i)/INNER_COUNT),theta=Math.sqrt(INNER_COUNT*Math.PI)*phi;
+          const fold=Math.sin(phi*12)*Math.cos(theta*10)*0.15,r=INNER_RADIUS*(1+fold);
+          inPos[i*3]=r*Math.cos(theta)*Math.sin(phi); inPos[i*3+1]=r*Math.sin(theta)*Math.sin(phi); inPos[i*3+2]=r*Math.cos(phi);
+          inStars[i]=Math.pow(Math.random(),4); inSz[i]=1;
+          const nv=new THREE.Vector3(inPos[i*3],inPos[i*3+1],inPos[i*3+2]);
+          let lobe=LOBES[0],minD=Infinity;
+          LOBES.forEach(l=>{ const d=nv.distanceTo(l.pos); if(d<minD){minD=d;lobe=l;} });
+          const c=new THREE.Color(getColorByNeuronType(lobe.idx));
+          inCol[i*3]=c.r*0.5; inCol[i*3+1]=c.g*0.5; inCol[i*3+2]=c.b*0.5;
+        }
+        getInnerNeuronPositions.current=inPos;
+        inGeo.setAttribute('position',new THREE.BufferAttribute(inPos,3));
+        inGeo.setAttribute('aBaseColor',new THREE.BufferAttribute(inCol,3));
+        inGeo.setAttribute('aSize',new THREE.BufferAttribute(inSz,1));
+        inGeo.setAttribute('aStars',new THREE.BufferAttribute(inStars,1));
+        innerMeshMatRef.current=new THREE.ShaderMaterial({
+          uniforms:{uTime:{value:0},uStress:{value:0},uConsciousness:{value:0},uDreaming:{value:0},uMoodInfluence:{value:0},uMoodColor:{value:moodColor},uRipplesPos:{value:ripplesPosArr.current},uRipplesProgress:{value:ripplesProgArr.current},uRipplesColor:{value:ripplesColArr.current},uLobePos:{value:LOBES.map(l=>l.pos)},uLobeHypertrophy:{value:lobeHypertrophyRef.current},uLobeMemory:{value:lobeMemoryRef.current},uActiveNeurons:{value:activeNeuronPositionsRef.current},uActiveColors:{value:activeNeuronColorsRef.current},uActiveStrength:{value:activeNeuronStrengthRef.current},uActiveCount:{value:0}},
+          vertexShader:innerVertexShader,fragmentShader:innerFragmentShader,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false
+        });
+        innerMeshRef.current=new THREE.Points(inGeo,innerMeshMatRef.current);
+        world.add(innerMeshRef.current);
+
+        // Animation pool
+        const pool=[];
+        for(let i=0;i<POOL_SIZE;i++){
+          const dummyPoints=new Float32Array(51*3),ratios=new Float32Array(51);
+          for(let r=0;r<=50;r++) ratios[r]=r/50;
+          const lineGeo=new THREE.BufferGeometry();
+          lineGeo.setAttribute('position',new THREE.BufferAttribute(dummyPoints,3));
+          lineGeo.setAttribute('aRatio',new THREE.BufferAttribute(ratios,1));
+          const lineMat=new THREE.ShaderMaterial({uniforms:{uTime:{value:0},uColor:{value:new THREE.Color()},uProgress:{value:0},uDecay:{value:1}},vertexShader:lineVertexShader,fragmentShader:lineFragmentShader,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false});
+          const line=new THREE.Line(lineGeo,lineMat); line.visible=false; synapseGroupRef.current.add(line);
+          const packet=new THREE.Mesh(new THREE.SphereGeometry(1.5,6,6),new THREE.MeshBasicMaterial({color:0xffffff,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true}));
+          packet.visible=false; photonGroupRef.current.add(packet);
+          pool.push({state:'idle',p:0,decay:1,trail:line,packet,p0:new THREE.Vector3(),p1:new THREE.Vector3(),p2:new THREE.Vector3()});
+        }
+        poolRef.current=pool;
+
+        // Pulse ring pool — particle dots arranged in a circle, matching neuron aesthetic
+        const RING_POOL = 24;
+        const RING_DOTS = 80; // number of particle nodes per ring
+        const ringVertexShader = `
+          uniform float uRadius;
+          uniform float uOpacity;
+          attribute vec3 color;
+          varying vec3 vColor;
+          varying float vOpacity;
+          void main() {
+            vColor = color;
+            vOpacity = uOpacity;
+            // Scale the unit-circle positions by current radius
+            vec3 scaled = position * uRadius;
+            vec4 mvPos = modelViewMatrix * vec4(scaled, 1.0);
+            gl_PointSize = (3.5 + uRadius * 0.04) * (500.0 / -mvPos.z);
+            gl_Position = projectionMatrix * mvPos;
+          }
+        `;
+        const ringFragmentShader = `
+          uniform float uOpacity;
+          varying vec3 vColor;
+          varying float vOpacity;
+          void main() {
+            float r = distance(gl_PointCoord, vec2(0.5));
+            if (r > 0.5) discard;
+            float glow = exp(-pow(r * 2.2, 2.0) * 3.5);
+            gl_FragColor = vec4(vColor * (1.5 + glow), glow * vOpacity);
+          }
+        `;
+        const rings = [];
+        for(let i=0;i<RING_POOL;i++){
+          // Build unit-circle positions (radius=1, will be scaled by uniform)
+          const pos = new Float32Array(RING_DOTS * 3);
+          const col = new Float32Array(RING_DOTS * 3);
+          for(let d=0;d<RING_DOTS;d++){
+            const angle = (d / RING_DOTS) * Math.PI * 2;
+            pos[d*3]   = Math.cos(angle);
+            pos[d*3+1] = Math.sin(angle);
+            pos[d*3+2] = 0;
+            col[d*3]=1; col[d*3+1]=1; col[d*3+2]=1; // overwritten at spawn
+          }
+          const ringGeo = new THREE.BufferGeometry();
+          ringGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+          ringGeo.setAttribute('color',    new THREE.BufferAttribute(col, 3));
+          const ringMat = new THREE.ShaderMaterial({
+            uniforms: { uRadius: {value:0.5}, uOpacity: {value:0} },
+            vertexShader: ringVertexShader,
+            fragmentShader: ringFragmentShader,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+          });
+          const ring = new THREE.Points(ringGeo, ringMat);
+          ring.visible = false;
+          ring.userData.speed = 1.0;
+          world.add(ring);
+          rings.push(ring);
+        }
+        pulseRingsRef.current = rings;
+
+        const animate=()=>{
+          if(!rendererRef.current) return;
+          if(isPlaying){
+            if(!isDragging.current) world.rotation.y+=0.00025;
+            const totalHypertrophy=Array.from(lobeHypertrophyRef.current).reduce((a,b)=>a+b,0);
+            const evolutionZoom=580+totalHypertrophy*25+smoothedVelocityRef.current*3+consciousnessRef.current*100;
+            if(Math.abs(targetZoomRef.current-580)<10) targetZoomRef.current=evolutionZoom;
+            zoomRef.current+=(targetZoomRef.current-zoomRef.current)*0.08;
+            camera.position.z=zoomRef.current;
+            smoothedVelocityRef.current+=(targetVelocityRef.current-smoothedVelocityRef.current)*0.06;
+            targetVelocityRef.current*=0.97;
+            const currentStress=smoothedVelocityRef.current/100;
+            const globalTime=performance.now()*0.001;
+            const moodStrength=(emotionsRef.current.joy+emotionsRef.current.curiosity+emotionsRef.current.frustration+emotionsRef.current.satisfaction)/4;
+            outerMeshMatRef.current.uniforms.uTime.value=globalTime;
+            outerMeshMatRef.current.uniforms.uStress.value=currentStress;
+            outerMeshMatRef.current.uniforms.uConsciousness.value=consciousnessRef.current;
+            outerMeshMatRef.current.uniforms.uMoodInfluence.value=moodStrength;
+            innerMeshMatRef.current.uniforms.uTime.value=globalTime;
+            innerMeshMatRef.current.uniforms.uStress.value=currentStress;
+            innerMeshMatRef.current.uniforms.uConsciousness.value=consciousnessRef.current;
+            innerMeshMatRef.current.uniforms.uDreaming.value=dreamingRef.current;
+            innerMeshMatRef.current.uniforms.uMoodInfluence.value=moodStrength;
+            innerMeshMatRef.current.uniforms.uMoodColor.value=new THREE.Color(Math.max(0.3,emotionsRef.current.joy),Math.max(0.3,emotionsRef.current.curiosity),Math.max(0.3,emotionsRef.current.satisfaction));
+            innerMeshMatRef.current.uniforms.uActiveNeurons.value=activeNeuronPositionsRef.current;
+            innerMeshMatRef.current.uniforms.uActiveColors.value=activeNeuronColorsRef.current;
+            innerMeshMatRef.current.uniforms.uActiveStrength.value=activeNeuronStrengthRef.current;
+            innerMeshMatRef.current.uniforms.uActiveCount.value=activeNeuronCountRef.current;
+            for(let i=0;i<4;i++){ lobeHypertrophyRef.current[i]=Math.max(0,lobeHypertrophyRef.current[i]-0.004); lobeMemoryRef.current[i]=Math.max(0,lobeMemoryRef.current[i]-0.002); }
+            const progresses=innerMeshMatRef.current.uniforms.uRipplesProgress.value;
+            for(let i=0;i<MAX_RIPPLES;i++) if(progresses[i]>0&&progresses[i]<1) progresses[i]+=0.003;
+            for(let i=0;i<poolRef.current.length;i++){
+              const anim=poolRef.current[i]; if(anim.state==='idle') continue;
+              anim.trail.material.uniforms.uTime.value=globalTime;
+              if(anim.state==='moving'){
+                anim.p+=0.05;
+                if(anim.p>=1){ anim.state='decaying'; anim.packet.visible=false; }
+                else{ const t=anim.p,mt=1-t; anim.packet.position.set(mt*mt*anim.p0.x+2*mt*t*anim.p1.x+t*t*anim.p2.x,mt*mt*anim.p0.y+2*mt*t*anim.p1.y+t*t*anim.p2.y,mt*mt*anim.p0.z+2*mt*t*anim.p1.z+t*t*anim.p2.z); anim.trail.material.uniforms.uProgress.value=anim.p; }
+              } else if(anim.state==='decaying'){
+                anim.decay-=0.03; anim.trail.material.uniforms.uDecay.value=anim.decay;
+                if(anim.decay<=0){ anim.state='idle'; anim.trail.visible=false; }
+              }
+            }
+            // Animate particle pulse rings: expand radius uniform, fade opacity
+            if(pulseRingsRef.current){
+              for(let i=0;i<pulseRingsRef.current.length;i++){
+                const ring=pulseRingsRef.current[i];
+                if(!ring.visible) continue;
+                const r = ring.material.uniforms.uRadius.value + ring.userData.speed * 0.55;
+                ring.material.uniforms.uRadius.value = r;
+                // Fade as ring approaches the cortex shell
+                ring.material.uniforms.uOpacity.value = Math.max(0, 0.95 * (1.0 - r / INNER_RADIUS));
+                if(r >= INNER_RADIUS){
+                  ring.visible = false;
+                  ring.material.uniforms.uRadius.value = 0.5;
+                  ring.material.uniforms.uOpacity.value = 0;
+                }
+              }
+            }
+          }
+          renderer.render(scene,camera);
+          requestAnimationFrame(animate);
+        };
+        animate();
+
+        const onWheel=e=>{ e.preventDefault(); targetZoomRef.current=Math.max(10,Math.min(3000,targetZoomRef.current+e.deltaY*0.8)); };
+        const onKey=e=>{ if(e.key==='+'||e.key==='=') targetZoomRef.current=Math.max(10,targetZoomRef.current-50); if(e.key==='-') targetZoomRef.current=Math.min(3000,targetZoomRef.current+50); if(e.key==='0') targetZoomRef.current=580; if(e.key==='9') targetZoomRef.current=50; if(e.key==='1') targetZoomRef.current=3000; };
+        const onResize=()=>{ camera.aspect=containerRef.current.clientWidth/containerRef.current.clientHeight; camera.updateProjectionMatrix(); renderer.setSize(containerRef.current.clientWidth,containerRef.current.clientHeight); };
+        window.addEventListener('wheel',onWheel,{passive:false});
+        window.addEventListener('keydown',onKey);
+        window.addEventListener('resize',onResize);
+        return ()=>{ renderer.dispose(); if(containerRef.current?.contains(renderer.domElement)) containerRef.current.removeChild(renderer.domElement); window.removeEventListener('wheel',onWheel); window.removeEventListener('keydown',onKey); window.removeEventListener('resize',onResize); };
+      },[isReady,isPlaying,selectedProfile]);
+
+      const getMoodEmoji=()=>{ const max=Math.max(emotions.joy,emotions.curiosity,emotions.frustration,emotions.satisfaction); if(emotions.joy===max) return "😊"; if(emotions.curiosity===max) return "🤔"; if(emotions.frustration===max) return "😤"; return "😌"; };
+
+      const getStateDescription=()=>{ if(state===STATES.PROCESSING){ if(activeLobe) return `Signal → ${activeLobe} (${currentSignalProgress}%)`; return "Processing..."; } if(state===STATES.AWAKE) return "Awaiting input..."; return state; };
+
+      if(!selectedProfile) return <ProfileSelector onSelectProfile={(key)=>{ setSelectedProfile(key); setCurrentProfileData(BRAIN_PROFILES[key]); }} />;
+
+      const dominantEmotion = Object.entries(emotions).reduce((a,b)=>b[1]>a[1]?b:a);
+      const LP = 260, RP = 240;
+
+      return (
+        <div style={{display:'flex',width:'100vw',height:'100vh',background:'#00010c',color:'#f1f5f9',fontFamily:'ui-monospace,monospace',userSelect:'none',overflow:'hidden',position:'relative'}}>
+
+          {/* 3D CANVAS */}
+          <div ref={containerRef} style={{position:'absolute',inset:0,zIndex:0}}
+            onMouseDown={()=>isDragging.current=true}
+            onMouseUp={()=>isDragging.current=false}
+            onMouseMove={e=>{ if(isDragging.current){ worldRef.current.rotation.y+=e.movementX*0.003; worldRef.current.rotation.x+=e.movementY*0.003; } }}
+          />
+
+          {/* TOP BAR */}
+          <div style={{position:'absolute',top:0,left:0,right:0,height:46,zIndex:50,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 12px',background:'rgba(0,0,0,0.9)',borderBottom:'1px solid rgba(255,255,255,0.07)',pointerEvents:'auto'}}>
+            <div style={{display:'flex',alignItems:'center',gap:10}}>
+              <div style={{background:'rgba(5,150,105,0.6)',padding:'5px 8px',borderRadius:7,border:'1px solid rgba(52,211,153,0.35)'}}>
+                <BrainCircuit size={16} style={{color:'#34d399',display:'block'}}/>
+              </div>
+              <div>
+                <div style={{fontWeight:900,fontSize:14,color:'#60a5fa',letterSpacing:2}}>CORTEX V48</div>
+                <div style={{fontSize:9,color:'#34d399'}}>{currentProfileData?.name} · {(consciousness*100).toFixed(0)}% Conscious · {isPlaying?'LIVE':'PAUSED'}</div>
+              </div>
+              <div style={{display:'flex',gap:4,marginLeft:10}}>
+                <button onClick={()=>setShowLeft(v=>!v)} style={{fontSize:9,padding:'3px 8px',borderRadius:4,border:`1px solid ${showLeft?'rgba(52,211,153,0.5)':'rgba(255,255,255,0.1)'}`,background:showLeft?'rgba(52,211,153,0.1)':'transparent',color:showLeft?'#34d399':'#334155',cursor:'pointer',fontFamily:'inherit',transition:'all 0.2s'}}>
+                  {showLeft?'◀':'▶'} FEED
+                </button>
+                <button onClick={()=>setShowRight(v=>!v)} style={{fontSize:9,padding:'3px 8px',borderRadius:4,border:`1px solid ${showRight?'rgba(96,165,250,0.5)':'rgba(255,255,255,0.1)'}`,background:showRight?'rgba(96,165,250,0.1)':'transparent',color:showRight?'#60a5fa':'#334155',cursor:'pointer',fontFamily:'inherit',transition:'all 0.2s'}}>
+                  BRAIN {showRight?'▶':'◀'}
+                </button>
+              </div>
+            </div>
+            <div style={{display:'flex',gap:5,alignItems:'center'}}>
+              {[['PULSE',velocity,'#34d399'],['EVENTS',evolutionScore,'#facc15'],['PATTERNS',patternRecognition,'#22d3ee'],['COMPLEX',emergentComplexity,'#c084fc']].map(([l,v,c])=>(
+                <div key={l} style={{background:'rgba(0,0,0,0.5)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:5,padding:'3px 8px',textAlign:'center',minWidth:52}}>
+                  <div style={{fontSize:8,color:'#334155',letterSpacing:0.5}}>{l}</div>
+                  <div style={{fontWeight:900,fontSize:12,color:c}}>{v}</div>
+                </div>
+              ))}
+              <button onClick={()=>setIsPlaying(!isPlaying)} style={{padding:'5px 10px',borderRadius:5,border:'1px solid rgba(255,255,255,0.15)',background:isPlaying?'rgba(15,23,42,0.7)':'rgba(37,99,235,0.7)',color:'white',cursor:'pointer',display:'flex',alignItems:'center',gap:4,fontSize:10,fontWeight:700,fontFamily:'inherit'}}>
+                {isPlaying?<><Pause size={10}/> PAUSE</>:<><Play size={10}/> PLAY</>}
+              </button>
+            </div>
+          </div>
+
+          {/* LEFT PANEL — slides off-screen when hidden */}
+          <div style={{position:'absolute',top:46,left:showLeft?0:-LP,bottom:42,width:LP,zIndex:40,display:'flex',flexDirection:'column',background:'rgba(0,1,10,0.93)',borderRight:'1px solid rgba(255,255,255,0.07)',transition:'left 0.22s cubic-bezier(0.4,0,0.2,1)',pointerEvents:showLeft?'auto':'none'}}>
+            <div style={{padding:'8px 12px',borderBottom:'1px solid rgba(255,255,255,0.06)',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0}}>
+              <span style={{fontSize:10,fontWeight:700,color:'#34d399',letterSpacing:1}}>LIVE GITHUB EVENTS</span>
+              <div style={{display:'flex',alignItems:'center',gap:5}}>
+                <div style={{width:6,height:6,borderRadius:'50%',background:feedConnected?'#34d399':'#ef4444',boxShadow:feedConnected?'0 0 6px #34d399':'none'}}></div>
+                <span style={{fontSize:8,color:'#334155'}}>{feedConnected?'LIVE':'CONNECTING'}</span>
+              </div>
+            </div>
+            <div style={{flex:1,overflowY:'auto',padding:'3px 0'}}>
+              {liveFeed.length===0&&(
+                <div style={{padding:'20px 14px',fontSize:11,color:'#1e293b',textAlign:'center'}}>Waiting for events...</div>
+              )}
+              {liveFeed.map((item,i)=>(
+                <div key={item.id} style={{padding:'8px 12px 6px 10px',borderLeft:`3px solid ${item.color}`,marginBottom:1,background:i===0?'rgba(255,255,255,0.035)':'transparent',opacity:Math.max(0.2,1-i*0.022)}}>
+                  <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:3}}>
+                    <span style={{fontSize:9,fontWeight:700,color:item.color,background:`${item.color}1a`,padding:'1px 5px',borderRadius:3,letterSpacing:0.5}}>{item.type}</span>
+                    <span style={{fontSize:8,color:'#1e293b'}}>{item.ts}</span>
+                  </div>
+                  <div style={{fontSize:12,fontWeight:700,color:'#e2e8f0',marginBottom:2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>@{item.user}</div>
+                  <div style={{fontSize:10,color:'#64748b',wordBreak:'break-all',lineHeight:1.4,marginBottom:2}}>{item.repo}</div>
+                  <div style={{fontSize:8,color:'#1e293b'}}>→ {item.lobe}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* RIGHT PANEL — slides off-screen when hidden */}
+          <div style={{position:'absolute',top:46,right:showRight?0:-RP,bottom:42,width:RP,zIndex:40,display:'flex',flexDirection:'column',background:'rgba(0,1,10,0.93)',borderLeft:'1px solid rgba(255,255,255,0.07)',transition:'right 0.22s cubic-bezier(0.4,0,0.2,1)',pointerEvents:showRight?'auto':'none',overflowY:'auto'}}>
+
+            {/* Profile */}
+            <div style={{padding:'8px 12px',borderBottom:'1px solid rgba(255,255,255,0.06)',flexShrink:0}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:4}}>
+                <span style={{fontSize:9,fontWeight:700,color:'#334155',letterSpacing:1}}>BRAIN PROFILE</span>
+                <button onClick={()=>setMenuOpen(v=>!v)} style={{fontSize:9,color:'#34d399',border:'1px solid rgba(52,211,153,0.25)',padding:'1px 6px',borderRadius:3,background:'transparent',cursor:'pointer',fontFamily:'inherit'}}>{menuOpen?'CLOSE':'SWITCH'}</button>
+              </div>
+              <div style={{fontSize:12,fontWeight:900,color:'#34d399',marginBottom:2}}>{currentProfileData?.name}</div>
+              <div style={{fontSize:9,color:'#1e293b',lineHeight:1.4}}>{currentProfileData?.description}</div>
+              {menuOpen&&(
+                <div style={{marginTop:6,display:'flex',flexDirection:'column',gap:2}}>
+                  {Object.entries(BRAIN_PROFILES).map(([key,p])=>(
+                    <button key={key} onClick={()=>{setSelectedProfile(key);setCurrentProfileData(p);setMenuOpen(false);}}
+                      style={{textAlign:'left',padding:'5px 7px',borderRadius:4,border:`1px solid ${selectedProfile===key?'rgba(52,211,153,0.5)':'rgba(255,255,255,0.06)'}`,background:selectedProfile===key?'rgba(52,211,153,0.07)':'rgba(0,0,0,0.3)',cursor:'pointer',color:selectedProfile===key?'#34d399':'#64748b',fontSize:10,fontFamily:'inherit',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                      <span style={{fontWeight:700}}>{p.name}</span>
+                      <span style={{fontSize:8,color:'#1e293b'}}>{Math.round(p.innerCount/1000)}k neurons</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Consciousness */}
+            <div style={{padding:'8px 12px',borderBottom:'1px solid rgba(255,255,255,0.06)',flexShrink:0}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:5}}>
+                <span style={{fontSize:9,fontWeight:700,color:'#334155',letterSpacing:1}}>CONSCIOUSNESS</span>
+                <span style={{fontSize:14,fontWeight:900,color:'#c084fc'}}>{(consciousness*100).toFixed(1)}%</span>
+              </div>
+              <div style={{height:5,background:'rgba(255,255,255,0.06)',borderRadius:3,overflow:'hidden',marginBottom:3}}>
+                <div style={{height:'100%',width:`${consciousness*100}%`,background:'linear-gradient(90deg,#7c3aed,#c084fc)',borderRadius:3,transition:'width 0.5s'}}></div>
+              </div>
+              <div style={{fontSize:9,color:'#334155'}}>{getStateDescription()}</div>
+            </div>
+
+            {/* Active signal */}
+            {currentEvent&&(
+              <div style={{padding:'8px 12px',borderBottom:'1px solid rgba(255,255,255,0.06)',flexShrink:0}}>
+                <div style={{fontSize:9,fontWeight:700,color:'#334155',letterSpacing:1,marginBottom:5}}>ACTIVE SIGNAL</div>
+                <div style={{fontSize:8,color:'#334155',marginBottom:1}}>ROUTING TO</div>
+                <div style={{fontSize:11,fontWeight:700,color:'#60a5fa',marginBottom:5}}>{activeLobe}</div>
+                <div style={{fontSize:8,color:'#334155',marginBottom:1}}>REPOSITORY</div>
+                <div style={{fontSize:10,color:'#94a3b8',wordBreak:'break-all',lineHeight:1.4,marginBottom:4}}>{currentEvent}</div>
+                {memoryMatches.length>0&&<div style={{fontSize:9,color:'#c084fc',marginTop:2}}>⚡ {memoryMatches.length} memory {memoryMatches.length===1?'match':'matches'}</div>}
+              </div>
+            )}
+
+            {/* Emotions */}
+            <div style={{padding:'8px 12px',borderBottom:'1px solid rgba(255,255,255,0.06)',flexShrink:0}}>
+              <div style={{fontSize:9,fontWeight:700,color:'#334155',letterSpacing:1,marginBottom:6}}>EMOTIONAL STATE</div>
+              {[['Joy','joy','#34d399'],['Curiosity','curiosity','#22d3ee'],['Frustration','frustration','#f87171'],['Satisfaction','satisfaction','#facc15']].map(([label,key,color])=>(
+                <div key={key} style={{marginBottom:5}}>
+                  <div style={{display:'flex',justifyContent:'space-between',marginBottom:2}}>
+                    <span style={{fontSize:9,color:dominantEmotion[0]===key?color:'#334155',fontWeight:dominantEmotion[0]===key?700:400}}>{label}{dominantEmotion[0]===key?' ◀':''}</span>
+                    <span style={{fontSize:9,fontWeight:700,color}}>{(emotions[key]*100).toFixed(0)}%</span>
+                  </div>
+                  <div style={{height:3,background:'rgba(255,255,255,0.05)',borderRadius:2}}>
+                    <div style={{height:'100%',width:`${emotions[key]*100}%`,background:color,borderRadius:2,transition:'width 0.3s',opacity:0.85}}></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Lobe Activity */}
+            <div style={{padding:'8px 12px',borderBottom:'1px solid rgba(255,255,255,0.06)',flexShrink:0}}>
+              <div style={{fontSize:9,fontWeight:700,color:'#334155',letterSpacing:1,marginBottom:6}}>LOBE ACTIVITY</div>
+              {LOBES.map((lobe,idx)=>(
+                <div key={idx} style={{marginBottom:6}}>
+                  <div style={{display:'flex',justifyContent:'space-between',marginBottom:2}}>
+                    <span style={{fontSize:9,color:'#475569'}}>{lobe.name}</span>
+                    <span style={{fontSize:9,fontWeight:700,color:lobe.color}}>{Math.round(lobeActivityRef.current[idx]*100)}%</span>
+                  </div>
+                  <div style={{height:3,background:'rgba(255,255,255,0.05)',borderRadius:2}}>
+                    <div style={{height:'100%',width:`${lobeActivityRef.current[idx]*100}%`,background:lobe.color,borderRadius:2,transition:'width 0.2s'}}></div>
+                  </div>
+                  <div style={{fontSize:8,color:'#1e293b',marginTop:1}}>{lobe.function}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Neural Metrics */}
+            <div style={{padding:'8px 12px',flexShrink:0}}>
+              <div style={{fontSize:9,fontWeight:700,color:'#334155',letterSpacing:1,marginBottom:6}}>NEURAL METRICS</div>
+              {[['Plasticity',neuralPlasticity,'#facc15',100],['Patterns',patternRecognition,'#22d3ee',200],['Complexity',emergentComplexity,'#c084fc',100]].map(([label,val,color,max])=>(
+                <div key={label} style={{marginBottom:6}}>
+                  <div style={{display:'flex',justifyContent:'space-between',marginBottom:2}}>
+                    <span style={{fontSize:9,color:'#475569'}}>{label}</span>
+                    <span style={{fontSize:10,fontWeight:700,color}}>{val}</span>
+                  </div>
+                  <div style={{height:3,background:'rgba(255,255,255,0.05)',borderRadius:2}}>
+                    <div style={{height:'100%',width:`${Math.min(100,(val/max)*100)}%`,background:color,borderRadius:2,opacity:0.75}}></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* BOTTOM BAR */}
+          <div style={{position:'absolute',bottom:0,left:0,right:0,height:42,zIndex:50,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 12px',background:'rgba(0,0,0,0.9)',borderTop:'1px solid rgba(255,255,255,0.06)',pointerEvents:'auto'}}>
+            <div style={{display:'flex',gap:4,alignItems:'center'}}>
+              <span style={{fontSize:8,color:'#1e293b',marginRight:4,letterSpacing:1}}>ZOOM</span>
+              {[[50,'Deep'],[200,'Close'],[580,'Default'],[1200,'Far'],[3000,'Max']].map(([z,label])=>(
+                <button key={z} onClick={()=>targetZoomRef.current=z}
+                  style={{fontSize:9,padding:'3px 8px',borderRadius:4,border:'1px solid rgba(255,255,255,0.08)',background:'rgba(15,23,42,0.5)',color:'#475569',cursor:'pointer',fontFamily:'inherit'}}>
+                  {label}
+                </button>
+              ))}
+              <span style={{fontSize:8,color:'#1e293b',marginLeft:6}}>scroll · +/- · 0 9 1</span>
+            </div>
+            <div style={{display:'flex',gap:8,alignItems:'center'}}>
+              {[['#ef4444','Exec'],['#f97316','Sens'],['#facc15','Mem'],['#4ade80','Cog'],['#22d3ee','Assoc'],['#818cf8','Temp'],['#f472b6','Emot'],['#a78bfa','Integ']].map(([c,l])=>(
+                <div key={l} style={{display:'flex',alignItems:'center',gap:3}}>
+                  <div style={{width:5,height:5,borderRadius:'50%',background:c,boxShadow:`0 0 3px ${c}`}}></div>
+                  <span style={{fontSize:8,color:'#334155'}}>{l}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {!isReady&&<div style={{position:'absolute',inset:0,background:'black',zIndex:50,display:'flex',alignItems:'center',justifyContent:'center'}}><RefreshCw size={40} style={{color:'#10b981',opacity:0.4}}/></div>}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+  </script>
+</body>
+</html>
