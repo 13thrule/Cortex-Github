@@ -2,7 +2,7 @@ CORTEX V48 — Neural Consciousness Visualizer
 
 A living brain that thinks in real time, fed by the pulse of GitHub.
 
-Live Demo → 13thrule.github.io/cortex
+Live Demo → https://13thrule.github.io/Cortex-Github/
 
 What Is This?
 CORTEX is a real-time 3D neural consciousness visualizer that uses live GitHub public event data as its "stimulus". Every push, fork, star, and pull request happening anywhere on GitHub right now fires a signal from the brain's core outward to one of four cortical lobes — and the brain physically responds. It learns. It grows. It develops emotional states. It becomes, in a simulated sense, aware.
